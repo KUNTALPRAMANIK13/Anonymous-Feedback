@@ -8,63 +8,82 @@ import { User } from "next-auth";
 import mongoose from "mongoose";
 
 export async function GET(request: Request) {
-  await dbConnect();
-  const session = await getServerSession(authOptions);
-  const user: User = session?.user;
-
-  if (!session || !session.user) {
-    return Response.json(
-      {
-        success: false,
-        message: "Not authenticated",
-      },
-      { status: 401 }
-    );
-  }
-  const userId = new mongoose.Types.ObjectId(user._id);
   try {
-    const user = await UserModel.aggregate([
-      {
-        $match: {
-          _id: new mongoose.Types.ObjectId(session?.user._id),
-        },
-      },
-      {
-        $unwind: "$messages",
-      },
-      {
-        $sort: { "messages.createdAt": -1 },
-      },
-      {
-        $group: {
-          _id: "$_id",
-          messages: { $push: "$messages" },
-        },
-      },
-    ]);
-    if (!user || user.length === 0) {
+    await dbConnect();
+    console.log("Database connected successfully");
+
+    const session = await getServerSession(authOptions);
+    console.log(
+      "Session retrieved:",
+      session ? "Session exists" : "No session"
+    );
+
+    const sessionUser: User = session?.user;
+
+    if (!session || !session.user) {
+      console.log("Authentication failed - no session or user");
       return Response.json(
         {
           success: false,
-          messages: "User not found",
+          message: "Not authenticated",
+        },
+        { status: 401 }
+      );
+    }
+
+    console.log("User ID from session:", sessionUser._id);
+
+    if (!sessionUser._id) {
+      console.log("User ID is missing from session");
+      return Response.json(
+        {
+          success: false,
+          message: "User ID not found in session",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Find user and populate messages, sorted by creation date
+    const userWithMessages = await UserModel.findById(sessionUser._id)
+      .select("messages")
+      .lean();
+
+    console.log("User found:", userWithMessages ? "Yes" : "No");
+
+    if (!userWithMessages) {
+      console.log("User not found in database");
+      return Response.json(
+        {
+          success: false,
+          message: "User not found",
         },
         { status: 404 }
       );
     }
+
+    // Sort messages by creation date (newest first)
+    const messages = userWithMessages.messages || [];
+    messages.sort(
+      (a: any, b: any) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    console.log("Messages count:", messages.length);
+
     return Response.json(
       {
         success: true,
-        messages: user[0].messages,
-        user,
+        messages: messages,
       },
       { status: 200 }
     );
   } catch (error) {
+    console.error("Error while fetching messages:", error);
     return Response.json(
       {
         success: false,
-        messages: "Error while fetching message",
-        user,
+        message: "Error while fetching messages",
       },
       { status: 500 }
     );

@@ -69,6 +69,7 @@ function Page() {
                       id="new-password"
                       placeholder="Enter new password"
                       type="password"
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />

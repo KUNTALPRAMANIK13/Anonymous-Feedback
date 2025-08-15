@@ -14,8 +14,9 @@ async function dbConnect(): Promise<void> {
     connection.isConnected = db.connections[0].readyState;
     console.log("dbConnected Successfully");
   } catch (error) {
-    console.log("database connection failed",error)
-    process.exit()
+  console.error("database connection failed", error);
+  // In Next.js runtime, avoid exiting the process; rethrow to let caller handle
+  throw new Error("Database connection failed");
   }
 }
 export default dbConnect

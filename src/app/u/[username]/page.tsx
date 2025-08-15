@@ -79,13 +79,24 @@ function Page() {
     setIsSuggestButtonLoading(true);
     try {
       const result = await axios.post("/api/suggest-messages");
-      const response = result.data.message.candidates[0].content.parts[0].text;
-      setText(response);
-      return response;
+      console.log("Suggest messages response:", result.data);
+
+      if (result.data.success && result.data.suggestions) {
+        // Join all suggestions with the special character separator
+        const allSuggestions = result.data.suggestions.join(specialChar);
+        setText(allSuggestions);
+        return allSuggestions;
+      } else {
+        throw new Error("No suggestions received from API");
+      }
     } catch (error: any) {
+      console.error("Error getting suggestions:", error);
       toast({
-        title: "error",
-        description: error.message,
+        title: "Error",
+        description:
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to get suggestions",
         variant: "destructive",
       });
     } finally {

@@ -10,7 +10,7 @@ export const authOptions: NextAuthOptions = {
       id: "credentials",
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "text" },
+        identifier: { label: "Email or Username", type: "text" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials: any): Promise<any> {
@@ -39,27 +39,29 @@ export const authOptions: NextAuthOptions = {
             throw new Error("Incorrect password ");
           }
         } catch (error: any) {
-          throw new Error(error);
+          const message = error?.message ?? "Authentication failed";
+          throw new Error(message);
         }
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: any) {
       if (user) {
-        token._id = user._id?.toString();
-        token.isVerfied = user.isVerified;
-        token.isAcceptingMessages = user.isAcceptingMessages;
-        token.username = user.username;
+        token._id = (user as any)._id?.toString();
+        token.isVerified = (user as any).isVerified;
+        // map DB field (isAcceptMessage) to token/session field (isAcceptingMessages)
+        token.isAcceptingMessages = (user as any).isAcceptMessage;
+        token.username = (user as any).username;
       }
       return token;
     },
-    async session({ session, token }) {
+  async session({ session, token }: any) {
       if (token) {
-        session.user._id = token._id;
-        session.user.isVerified = token.isVerified;
-        session.user.isAcceptingMessages = token.isAcceptingMessages;
-        session.user.username = token.username;
+        (session.user as any)._id = token._id as string | undefined;
+        (session.user as any).isVerified = token.isVerified as boolean | undefined;
+        (session.user as any).isAcceptingMessages = token.isAcceptingMessages as boolean | undefined;
+        (session.user as any).username = token.username as string | undefined;
       }
       return session;
     },

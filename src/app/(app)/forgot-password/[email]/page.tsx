@@ -36,11 +36,11 @@ function Page() {
 
   async function OnHandleSubmit(data: z.infer<typeof verifySchema>) {
     try {
-      const response = await axios.post("/api/forgot-password-verify-code", {
+  const response = await axios.post("/api/forgot-password-verify-code", {
         email: params.email,
         code: data.code,
       });
-      if ((response.status = 200)) {
+  if (response.status === 200) {
         router.push(`/forgot-password/${params.email}/change-password`);
       }
     } catch (error: any) {

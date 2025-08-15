@@ -7,7 +7,7 @@ import dbConnect from "@/lib/dbConnect";
 import { User } from "next-auth";
 
 export async function POST(request: Request) {
-  dbConnect();
+  await dbConnect();
 
   const session = await getServerSession(authOptions);
   const user: User = session?.user;
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
-  dbConnect();
+  await dbConnect();
 
   const session = await getServerSession(authOptions);
   const user: User = session?.user;
@@ -99,7 +99,7 @@ export async function GET(request: Request) {
   } catch (error) {
     return Response.json(
       {
-        success: true,
+  success: false,
         message: error,
       },
       { status: 500 }

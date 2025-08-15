@@ -25,6 +25,9 @@ function Page() {
   const { data: session } = useSession();
   const form = useForm({
     resolver: zodResolver(acceptMessageSchema),
+    defaultValues: {
+      acceptMessage: false,
+    },
   });
   const { register, watch, setValue } = form;
   const acceptMessage = watch("acceptMessage");
@@ -51,7 +54,9 @@ function Page() {
       setIsLoading(true);
       setIsSwitchLoading(false);
       try {
+        console.log("Fetching messages...");
         const response = await axios.get<ApiResponse>("/api/get-message");
+        console.log("Messages response:", response.data);
         setMessages(response.data.messages || []);
 
         if (refresh) {
@@ -62,11 +67,11 @@ function Page() {
         }
       } catch (error) {
         const axiosError = error as AxiosError<ApiResponse>;
+        console.error("Error fetching messages:", axiosError);
         toast({
           title: "Error",
           description:
-            axiosError.response?.data.message ||
-            "Failed to fetch message setting ",
+            axiosError.response?.data.message || "Failed to fetch messages",
           variant: "destructive",
         });
       } finally {

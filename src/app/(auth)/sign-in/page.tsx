@@ -51,7 +51,7 @@ export default function SignIn() {
       password: data.password,
     });
     if (
-      result?.error == "Error: Please verify your account first before login"
+      result?.error?.includes("Please verify your account first before login")
     ) {
       router.replace(`/verify/${data.identifier}`);
     }
@@ -128,10 +128,19 @@ export default function SignIn() {
                     Forgot password
                   </Link>
                 </p>
-                <CardFooter className="flex items-center justify-between">
+                <CardFooter className="flex items-center justify-between gap-2">
                   <Link className="text-sm underline" href="/sign-up">
                     Don&apos;t have an account? Sign up
                   </Link>
+                  <Button
+                    type="button"
+                    variant="default"
+                    onClick={() => {
+                      window.location.href = "/recruiter-start";
+                    }}
+                  >
+                    Recruiter Demo
+                  </Button>
                   <Button type="submit" disabled={isSubmitting}>
                     {isSubmitting ? (
                       <>

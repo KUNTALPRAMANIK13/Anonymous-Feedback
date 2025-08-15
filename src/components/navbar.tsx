@@ -26,14 +26,26 @@ function Navbar() {
             </Button>
           </>
         ) : (
-          <Link href="/sign-in">
+          <div className="flex gap-2">
             <Button
-              className="w-full md:w-auto bg-slate-100 text-black"
-              variant={"outline"}
+              className="w-full md:w-auto"
+              variant={"default"}
+              onClick={() => {
+                // Force full navigation so Set-Cookie applies immediately
+                window.location.href = "/recruiter-start";
+              }}
             >
-              Login
+              Recruiter Demo
             </Button>
-          </Link>
+            <Link href="/sign-in">
+              <Button
+                className="w-full md:w-auto bg-slate-100 text-black"
+                variant={"outline"}
+              >
+                Login
+              </Button>
+            </Link>
+          </div>
         )}
       </div>
     </nav>
