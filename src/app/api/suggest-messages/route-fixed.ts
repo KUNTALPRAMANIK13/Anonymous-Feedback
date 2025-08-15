@@ -92,7 +92,7 @@ export async function POST(req: Request) {
     console.log("Suggest messages API called");
 
     // Check if API key is available
-    if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+    if (!process.env['GOOGLE_GENERATIVE_AI_API_KEY']) {
       console.error("Missing GOOGLE_GENERATIVE_AI_API_KEY");
       return NextResponse.json(
         {
@@ -106,7 +106,7 @@ export async function POST(req: Request) {
 
     console.log("Initializing Google Generative AI...");
     const genAI = new GoogleGenerativeAI(
-      process.env.GOOGLE_GENERATIVE_AI_API_KEY
+      process.env['GOOGLE_GENERATIVE_AI_API_KEY']
     );
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
@@ -132,12 +132,10 @@ Requirements:
 - Keep them inclusive, non-sensitive, and suitable for a wide audience.
 - Vary topics (e.g., hobbies, memories, creativity, travel, daily life, light introspection). Aim for diversity across the set.
 - Avoid repeating questions from the Exclude list, and avoid closely paraphrasing them.
-${topic ? `- Prefer a subtle theme around: ${topic}.\n` : ""}${
-      tone ? `- Suggested tone: ${tone}.\n` : ""
-    }${language ? `- Language: ${language}.\n` : ""}
-Exclude (do not use or closely paraphrase): ${
-      exclude.length ? exclude.join(" | ") : "(none)"
-    }
+${topic ? `- Prefer a subtle theme around: ${topic}.\n` : ""}${tone ? `- Suggested tone: ${tone}.\n` : ""
+      }${language ? `- Language: ${language}.\n` : ""}
+Exclude (do not use or closely paraphrase): ${exclude.length ? exclude.join(" | ") : "(none)"
+      }
 
 Randomization key: ${seed}
 
@@ -201,7 +199,9 @@ Example format (do NOT copy these, just follow the format): What's a hobby you'v
       // Shuffle fallback a little
       for (let i = remaining.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [remaining[i], remaining[j]] = [remaining[j], remaining[i]];
+        const temp = remaining[i]!;
+        remaining[i] = remaining[j]!;
+        remaining[j] = temp;
       }
       suggestions = [
         ...suggestions,

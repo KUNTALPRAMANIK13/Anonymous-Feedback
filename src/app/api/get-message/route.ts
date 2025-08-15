@@ -1,13 +1,9 @@
-import { getServerSession } from "next-auth";
-
-import { authOptions } from "../auth/[...nextauth]/options";
-import UserModel from "@/models/User.model";
 import dbConnect from "@/lib/dbConnect";
+import UserModel from "@/models/User.model";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/options";
 
-// Avoid strict NextAuth User typing; we'll narrow session.user after guard
-import mongoose from "mongoose";
-
-export async function GET(request: Request) {
+export async function GET() {
   try {
     await dbConnect();
     console.log("Database connected successfully");

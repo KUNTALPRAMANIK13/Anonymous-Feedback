@@ -1,11 +1,10 @@
 "use client";
-import { useParams, useRouter } from "next/navigation";
 import React from "react";
+import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -15,8 +14,6 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
-import { NextRequest } from "next/server";
-import { EyeIcon } from "lucide-react";
 interface passwordProp {
   password: string;
 }
@@ -33,7 +30,7 @@ function Page() {
   async function onChangePassword(data: passwordProp) {
     try {
       const response = await axios.patch("/api/change-password", {
-        email: params.email,
+        email: params["email"],
         password: data.password,
       });
       if (response.status == 200) {

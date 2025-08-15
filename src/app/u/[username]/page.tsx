@@ -1,13 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+
 import { useForm } from "react-hook-form";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -18,9 +11,10 @@ import Link from "next/link";
 import { messageSchema } from "@/schemas/message.schema";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios, { Axios } from "axios";
+import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
+import { Form, FormControl, FormField, FormLabel } from "@/components/ui/form";
 
 function Page() {
   const [isLoading, setIsLoading] = useState(false);

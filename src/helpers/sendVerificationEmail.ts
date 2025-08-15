@@ -4,7 +4,7 @@ import { ApiResponse } from "@/types/apiResponse";
 
 // Initialize Resend with error checking
 const initializeResend = () => {
-  const apiKey = process.env.RESEND_API_KEY;
+  const apiKey = process.env['RESEND_API_KEY'];
   if (!apiKey) {
     console.error("RESEND_API_KEY is not set in environment variables");
     return null;
@@ -22,10 +22,10 @@ export async function sendVerificationEmail(
     console.log("Attempting to send verification email to:", email);
     console.log("Username:", username);
     console.log("Verification code:", verifyCode);
-    console.log("Resend API Key exists:", !!process.env.RESEND_API_KEY);
+    console.log("Resend API Key exists:", !!process.env['RESEND_API_KEY']);
     console.log(
       "Resend API Key length:",
-      process.env.RESEND_API_KEY?.length || 0
+      process.env['RESEND_API_KEY']?.length || 0
     );
 
     const resend = initializeResend();
@@ -40,7 +40,7 @@ export async function sendVerificationEmail(
 
     // Use environment variable for custom domain or fallback to resend.dev
     const fromEmail =
-      process.env.EMAIL_FROM || "Anonymous Feedback <onboarding@resend.dev>";
+      process.env['EMAIL_FROM'] || "Anonymous Feedback <onboarding@resend.dev>";
     console.log("Using from email:", fromEmail);
 
     const result = await resend.emails.send({
@@ -68,9 +68,8 @@ export async function sendVerificationEmail(
 
       return {
         success: false,
-        message: `Failed to send verification email: ${
-          result.error.message || JSON.stringify(result.error)
-        }`,
+        message: `Failed to send verification email: ${result.error.message || JSON.stringify(result.error)
+          }`,
       };
     }
 
@@ -100,11 +99,10 @@ export async function sendVerificationEmail(
 
     return {
       success: false,
-      message: `Failed to send verification email: ${
-        emailError instanceof Error
+      message: `Failed to send verification email: ${emailError instanceof Error
           ? emailError.message
           : "Unknown error occurred"
-      }`,
+        }`,
     };
   }
 }

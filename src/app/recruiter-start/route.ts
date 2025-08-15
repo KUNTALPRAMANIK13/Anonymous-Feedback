@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 // GET /recruiter-start
 // Server-side redirect to recruiter login with secret key from env.
 export async function GET(request: NextRequest) {
-  const key = process.env.RECRUITER_ACCESS_KEY;
+  const key = process.env['RECRUITER_ACCESS_KEY'];
   if (!key) {
     return NextResponse.json(
       { success: false, message: "Recruiter access is not configured." },

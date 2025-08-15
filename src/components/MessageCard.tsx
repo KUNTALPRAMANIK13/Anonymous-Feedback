@@ -12,7 +12,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "./ui/button";
-import { TrashIcon, X } from "lucide-react";
+import { TrashIcon } from "lucide-react";
 import { Message } from "@/models/Messages.model";
 import { useToast } from "./ui/use-toast";
 import axios from "axios";

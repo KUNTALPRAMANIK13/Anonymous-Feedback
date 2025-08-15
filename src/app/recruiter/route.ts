@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
     const key = url.searchParams.get("key") || "";
-    const accessKey = process.env.RECRUITER_ACCESS_KEY || "";
+    const accessKey = process.env['RECRUITER_ACCESS_KEY'] || "";
 
     if (!accessKey) {
       return NextResponse.json(
@@ -31,9 +31,9 @@ export async function GET(request: NextRequest) {
 
     await dbConnect();
 
-    const username = process.env.RECRUITER_DEMO_USERNAME?.trim() || "demo";
+    const username = process.env['RECRUITER_DEMO_USERNAME']?.trim() || "demo";
     const email =
-      process.env.RECRUITER_DEMO_EMAIL?.trim() || "demo@example.com";
+      process.env['RECRUITER_DEMO_EMAIL']?.trim() || "demo@example.com";
 
     // Ensure a demo user exists
     let userDoc = await UserModel.findOne({ username });

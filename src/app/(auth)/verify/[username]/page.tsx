@@ -1,7 +1,7 @@
 "use client";
 import { useToast } from "@/components/ui/use-toast";
 import { useParams, useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React from "react";
 import { verifySchema } from "@/schemas/verify.schema";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -14,20 +14,15 @@ import Link from "next/link";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 import {
   InputOTP,
   InputOTPGroup,
-  InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-
-import { Input } from "@/components/ui/input";
 
 function VerifyAccount() {
   const router = useRouter();

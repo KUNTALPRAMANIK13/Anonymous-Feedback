@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { acceptMessageSchema } from "@/schemas/acceptMessage.schema";
 import axios, { AxiosError } from "axios";
-import { ApiResponse } from "@/types/apiResponse";
+import { ApiResponse, MessageApiResponse } from "@/types/apiResponse";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
@@ -20,7 +20,9 @@ function Page() {
   const [isSwitchLoading, setIsSwitchLoading] = useState(false);
   const [hostName, setHostName] = useState("");
   function handleDeleteMessage(messageId: string) {
-    setMessages(messages.filter((message) => message._id !== messageId));
+    setMessages(
+      messages.filter(message => message._id.toString() !== messageId)
+    );
   }
   const { data: session } = useSession();
   const form = useForm({
@@ -38,9 +40,8 @@ function Page() {
         success: boolean;
         isAcceptingMessages: boolean;
       };
-      const response = await axios.get<AcceptApiResponse>(
-        `/api/accept-message`
-      );
+      const response =
+        await axios.get<AcceptApiResponse>(`/api/accept-message`);
       setValue("acceptMessage", response.data.isAcceptingMessages ?? false);
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
@@ -63,7 +64,7 @@ function Page() {
         console.log("Fetching messages...");
         const response = await axios.get<ApiResponse>("/api/get-message");
         console.log("Messages response:", response.data);
-        setMessages(response.data.messages || []);
+        setMessages((response.data as MessageApiResponse).messages || []);
 
         if (refresh) {
           toast({
@@ -120,7 +121,7 @@ function Page() {
       setHostName(window.location.host);
     }
   }, []);
-  const username = session?.user.username;
+  const username = (session?.user as any)?.username;
   const profileUrl = `${hostName}/u/${username}`;
 
   if (!session || !session?.user) {
@@ -174,7 +175,7 @@ function Page() {
       <Button
         className="mt-4"
         variant="outline"
-        onClick={(e) => {
+        onClick={e => {
           e.preventDefault();
           fetchMessage(true);
         }}

@@ -1,5 +1,8 @@
 import { z } from "zod";
-export const signInSchema = z.object({
-  identifier: z.string(),
-  password: z.string(),
-});
+import { signInSchema as formSchema } from "@/types/forms";
+
+// Re-export the schema from forms types
+export const signInSchema = formSchema;
+
+// Export the inferred type
+export type SignInSchema = z.infer<typeof signInSchema>;

@@ -17,8 +17,6 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
-import { AxiosError } from "axios";
-import { ApiResponse } from "@/types/apiResponse";
 
 function Page() {
   const router = useRouter();

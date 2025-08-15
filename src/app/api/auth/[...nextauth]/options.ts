@@ -14,63 +14,66 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials: any): Promise<any> {
-        await dbConnect();
-        try {
-          const user = await UserModel.findOne({
-            $or: [
-              { email: credentials.identifier },
-              { username: credentials.identifier },
-            ],
-          });
-          if (!user) {
-            throw new Error("No user found with this email");
-          }
-          if (!user.isVerified) {
-            throw new Error("Please verify your account first before login");
-          }
-
-          const isPasswordCorrect = await bcrypt.compare(
-            credentials.password,
-            user.password
-          );
-          if (isPasswordCorrect) {
-            return user;
-          } else {
-            throw new Error("Incorrect password ");
-          }
-        } catch (error: any) {
-          const message = error?.message ?? "Authentication failed";
-          throw new Error(message);
+        if (!credentials?.identifier || !credentials?.password) {
+          return null;
         }
+
+        await dbConnect();
+
+        const user = await UserModel.findOne({
+          $or: [
+            { email: credentials.identifier },
+            { username: credentials.identifier },
+          ],
+        });
+
+        if (!user) {
+          return null;
+        }
+
+        const isPasswordValid = await bcrypt.compare(
+          credentials.password,
+          user.password
+        );
+
+        if (!isPasswordValid) {
+          return null;
+        }
+
+        return {
+          id: user._id.toString(),
+          email: user.email,
+          username: user.username,
+          isVerified: user.isVerified,
+          isAcceptMessage: user.isAcceptMessage,
+        };
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }: any) {
+    async jwt({ token, user }) {
       if (user) {
-        token._id = (user as any)._id?.toString();
-        token.isVerified = (user as any).isVerified;
-        // map DB field (isAcceptMessage) to token/session field (isAcceptingMessages)
-        token.isAcceptingMessages = (user as any).isAcceptMessage;
-        token.username = (user as any).username;
+        (token as any)['_id'] = user.id;
+        (token as any)['username'] = user.username;
+        (token as any)['isVerified'] = user.isVerified;
+        (token as any)['isAcceptingMessages'] = user.isAcceptMessage;
       }
       return token;
     },
-  async session({ session, token }: any) {
-      if (token) {
-        (session.user as any)._id = token._id as string | undefined;
-        (session.user as any).isVerified = token.isVerified as boolean | undefined;
-        (session.user as any).isAcceptingMessages = token.isAcceptingMessages as boolean | undefined;
-        (session.user as any).username = token.username as string | undefined;
+    async session({ session, token }) {
+      if (token && session.user) {
+        (session.user as any)['_id'] = (token as any)['_id'] as string;
+        (session.user as any)['username'] = (token as any)['username'] as string;
+        (session.user as any)['isVerified'] = (token as any)['isVerified'] as boolean;
+        (session.user as any)['isAcceptingMessages'] = (token as any)['isAcceptingMessages'] as boolean;
       }
       return session;
     },
   },
-
   session: {
     strategy: "jwt",
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || "fallback-secret",
   pages: {
     signIn: "/sign-in",
   },

@@ -4,7 +4,6 @@ import Link from "next/link";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -17,12 +16,9 @@ import { signInSchema } from "@/schemas/signIn.schema";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import axios, { AxiosError } from "axios";
-import { ApiResponse } from "@/types/apiResponse";
 import { useToast } from "@/components/ui/use-toast";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Label } from "@/components/ui/label";
 import {
   Card,
   CardHeader,
@@ -32,7 +28,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 export default function SignIn() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
   const form = useForm<z.infer<typeof signInSchema>>({
@@ -95,7 +91,7 @@ export default function SignIn() {
                           required
                           placeholder="write username or email .... "
                           {...field}
-                          onChange={(e) => {
+                          onChange={e => {
                             field.onChange(e);
                           }}
                         />

@@ -1,14 +1,9 @@
-import { getServerSession } from "next-auth";
-
-import { authOptions } from "../../auth/[...nextauth]/options";
-import UserModel from "@/models/User.model";
 import dbConnect from "@/lib/dbConnect";
-
-// Avoid strict NextAuth User typing; narrow after guards
-import mongoose from "mongoose";
+import MessageModel from "@/models/Messages.model";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/options";
 
 export async function DELETE(
-  request: Request,
   { params }: { params: { messageid: string } }
 ) {
   const messageId = params.messageid;
@@ -26,14 +21,8 @@ export async function DELETE(
   }
 
   try {
-    const sessionUser = session.user as { _id?: string };
-    const updatedResult = await UserModel.updateOne(
-      { _id: sessionUser._id },
-      {
-        $pull: { messages: { _id: messageId } },
-      }
-    );
-    if (updatedResult.modifiedCount == 0) {
+    const updatedResult = await MessageModel.deleteOne({ _id: messageId });
+    if (updatedResult.deletedCount == 0) {
       return Response.json(
         {
           success: false,
