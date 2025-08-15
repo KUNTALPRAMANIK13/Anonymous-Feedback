@@ -34,8 +34,14 @@ function Page() {
   const fetchAcceptMessage = useCallback(async () => {
     setIsSwitchLoading(true);
     try {
-      const response = await axios.get<ApiResponse>(`/api/accept-message`);
-      setValue("acceptMessage", response.data.isAcceptingMessages);
+      type AcceptApiResponse = {
+        success: boolean;
+        isAcceptingMessages: boolean;
+      };
+      const response = await axios.get<AcceptApiResponse>(
+        `/api/accept-message`
+      );
+      setValue("acceptMessage", response.data.isAcceptingMessages ?? false);
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
       toast({
@@ -183,7 +189,7 @@ function Page() {
         {messages.length !== 0 ? (
           messages.map((message, index) => (
             <MessageCard
-              key={message._id}
+              key={String((message as any)._id ?? index)}
               message={message}
               onMessageDelete={handleDeleteMessage}
             />

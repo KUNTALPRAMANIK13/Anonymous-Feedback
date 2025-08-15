@@ -24,14 +24,15 @@ type messageCardProp = {
 function MessageCard({ message, onMessageDelete }: messageCardProp) {
   const { toast } = useToast();
   async function onDeleteMessage() {
+    const id = String((message as any)._id);
     const response = await axios.delete<ApiResponse>(
-      `/api/delete-message/${message._id}`
+      `/api/delete-message/${id}`
     );
     toast({
       title: response.data.message,
       variant: "default",
     });
-    onMessageDelete(message._id);
+    onMessageDelete(id);
   }
   return (
     <div>

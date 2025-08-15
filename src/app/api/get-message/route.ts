@@ -4,7 +4,7 @@ import { authOptions } from "../auth/[...nextauth]/options";
 import UserModel from "@/models/User.model";
 import dbConnect from "@/lib/dbConnect";
 
-import { User } from "next-auth";
+// Avoid strict NextAuth User typing; we'll narrow session.user after guard
 import mongoose from "mongoose";
 
 export async function GET(request: Request) {
@@ -18,8 +18,6 @@ export async function GET(request: Request) {
       session ? "Session exists" : "No session"
     );
 
-    const sessionUser: User = session?.user;
-
     if (!session || !session.user) {
       console.log("Authentication failed - no session or user");
       return Response.json(
@@ -30,6 +28,7 @@ export async function GET(request: Request) {
         { status: 401 }
       );
     }
+    const sessionUser = session.user as { _id?: string };
 
     console.log("User ID from session:", sessionUser._id);
 

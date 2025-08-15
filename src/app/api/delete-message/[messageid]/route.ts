@@ -4,7 +4,7 @@ import { authOptions } from "../../auth/[...nextauth]/options";
 import UserModel from "@/models/User.model";
 import dbConnect from "@/lib/dbConnect";
 
-import { User } from "next-auth";
+// Avoid strict NextAuth User typing; narrow after guards
 import mongoose from "mongoose";
 
 export async function DELETE(
@@ -14,7 +14,6 @@ export async function DELETE(
   const messageId = params.messageid;
   await dbConnect();
   const session = await getServerSession(authOptions);
-  const user: User = session?.user;
 
   if (!session || !session.user) {
     return Response.json(
@@ -27,8 +26,9 @@ export async function DELETE(
   }
 
   try {
+    const sessionUser = session.user as { _id?: string };
     const updatedResult = await UserModel.updateOne(
-      { _id: user._id },
+      { _id: sessionUser._id },
       {
         $pull: { messages: { _id: messageId } },
       }

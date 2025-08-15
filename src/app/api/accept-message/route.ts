@@ -4,14 +4,12 @@ import { authOptions } from "../auth/[...nextauth]/options";
 import UserModel from "@/models/User.model";
 import dbConnect from "@/lib/dbConnect";
 
-import { User } from "next-auth";
+// Avoid importing strict NextAuth User type; we'll narrow session.user after guards
 
 export async function POST(request: Request) {
   await dbConnect();
 
   const session = await getServerSession(authOptions);
-  const user: User = session?.user;
-
   if (!session || !session.user) {
     return Response.json(
       {
@@ -21,7 +19,8 @@ export async function POST(request: Request) {
       { status: 401 }
     );
   }
-  const userId = user._id;
+  const sessionUser = session.user as { _id?: string };
+  const userId = sessionUser._id;
   const { acceptMessages } = await request.json();
   try {
     const updatedUser = await UserModel.findByIdAndUpdate(
@@ -45,8 +44,8 @@ export async function POST(request: Request) {
       return Response.json(
         {
           success: true,
-          message: "message acceptence status updated successfully  ",
-          updatedUser,
+          message: "message acceptance status updated successfully",
+          isAcceptingMessages: Boolean(updatedUser.isAcceptMessage),
         },
         { status: 200 }
       );
@@ -66,9 +65,7 @@ export async function GET(request: Request) {
   await dbConnect();
 
   const session = await getServerSession(authOptions);
-  const user: User = session?.user;
-
-  if (!session || !user) {
+  if (!session || !session.user) {
     return Response.json(
       {
         success: false,
@@ -77,7 +74,8 @@ export async function GET(request: Request) {
       { status: 401 }
     );
   }
-  const foundUser = await UserModel.findById(user._id);
+  const sessionUser = session.user as { _id?: string };
+  const foundUser = await UserModel.findById(sessionUser._id);
   try {
     if (!foundUser) {
       return Response.json(
@@ -91,7 +89,7 @@ export async function GET(request: Request) {
       return Response.json(
         {
           success: true,
-          isAcceptingMessages: foundUser.isAcceptMessage,
+          isAcceptingMessages: Boolean(foundUser.isAcceptMessage),
         },
         { status: 200 }
       );
@@ -99,7 +97,7 @@ export async function GET(request: Request) {
   } catch (error) {
     return Response.json(
       {
-  success: false,
+        success: false,
         message: error,
       },
       { status: 500 }
